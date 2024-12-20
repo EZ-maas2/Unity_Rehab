@@ -6,17 +6,20 @@ using UnityEngine;
 
 public class UdpReceiver : MonoBehaviour
 {
-    private UdpClient udpClient;
-    public int listenPort = 12345; // Ensure this matches your ESP32's UDP port
-    private IPEndPoint remoteEndPoint;
-
-    [Serializable]
+     [Serializable]
     public struct TestStruct
     {
         public int x;
         public int y;
+        public int z;
     }
 
+    private UdpClient udpClient;
+    public int listenPort = 12345; // Ensure this matches your ESP32's UDP port
+    private IPEndPoint remoteEndPoint;
+    public static event Action<Vector3> OnPosReceived;
+
+   
     void Start()
     {
         udpClient = new UdpClient(listenPort);
@@ -44,6 +47,7 @@ public class UdpReceiver : MonoBehaviour
                 // Deserialize JSON into TestStruct
                 TestStruct receivedData = JsonUtility.FromJson<TestStruct>(jsonData);
                 Debug.Log($"Received Struct: x = {receivedData.x}, y = {receivedData.y}");
+                OnPosReceived?.Invoke(new Vector3(receivedData.x, receivedData.y, receivedData.z));
             }
         }
         catch (Exception e)
