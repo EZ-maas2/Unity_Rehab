@@ -15,7 +15,7 @@ public class UdpReceiver : MonoBehaviour
     }
 
     private UdpClient udpClient;
-    public int listenPort = 12345; // Ensure this matches your ESP32's UDP port
+    public int listenPort = 6969; // Ensure this matches your ESP32's UDP port
     private IPEndPoint remoteEndPoint;
     public static event Action<Vector3> OnPosReceived;
 
@@ -23,7 +23,7 @@ public class UdpReceiver : MonoBehaviour
     void Start()
     {
         udpClient = new UdpClient(listenPort);
-        remoteEndPoint = new IPEndPoint(IPAddress.Any, listenPort);
+        remoteEndPoint = new IPEndPoint(IPAddress.Any, listenPort); // IPAddress.Any means that we need to listen to all port activity
 
         Debug.Log($"Listening for UDP data on port {listenPort}.");
         BeginReceive();
@@ -41,13 +41,13 @@ public class UdpReceiver : MonoBehaviour
             byte[] data = udpClient.EndReceive(result, ref remoteEndPoint);
             if (data.Length > 0)
             {
-                string jsonData = Encoding.UTF8.GetString(data);
-                Debug.Log($"Received data: {jsonData}");
+                string received = Encoding.UTF8.GetString(data);
+                Debug.Log($"Received data: {received}");
+
+                string[] receivedData = received.Split(",");
 
                 // Deserialize JSON into TestStruct
-                TestStruct receivedData = JsonUtility.FromJson<TestStruct>(jsonData);
-                Debug.Log($"Received Struct: x = {receivedData.x}, y = {receivedData.y}");
-                OnPosReceived?.Invoke(new Vector3(receivedData.x, receivedData.y, receivedData.z));
+                OnPosReceived?.Invoke(new Vector3(float.Parse(receivedData[0]), float.Parse(receivedData[1]), float.Parse(receivedData[2])));
             }
         }
         catch (Exception e)
