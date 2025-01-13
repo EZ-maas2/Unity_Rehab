@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 
 
@@ -13,6 +14,9 @@ public class Control : MonoBehaviour
     public string[] target_seq =  {"Front", "Center", "Side", "Center"}; // maybe this should represnt tags of intended collsiion objects
     bool hitTarget = false;
     string currentTarget; // we want to notify interested parties when currentTarget gets changed
+    GameObject currentTargetObj;
+    public static event Action<GameObject> OnCurrTargetChanged;
+
     int target_ix = 0;
 
     // Start is called before the first frame update
@@ -20,7 +24,7 @@ public class Control : MonoBehaviour
     {
         // TO DO: subscribe hitTarget to get changed when some other script does something
         Collision.OnPlateTriger += ReactToCollision;
-        currentTarget = target_seq[target_ix];
+        SetCurrTarget(target_ix);
     }
 
     // Update is called once per frame
@@ -32,10 +36,17 @@ public class Control : MonoBehaviour
             target_ix ++;
             if (target_ix >= target_seq.Length) 
             { target_ix = 0; } // if we are outside of range of target sequence, restart it
-        }
-        currentTarget = target_seq[target_ix];
+        }   
+        SetCurrTarget(target_ix);
     }
 
+    void SetCurrTarget(int ix)
+    {
+        // get the current target object
+        currentTarget = target_seq[ix];
+        currentTargetObj = GameObject.Find(currentTarget);
+        OnCurrTargetChanged?.Invoke(currentTargetObj);
+    }
 
     void ReactToCollision(string tag){
         // here we will have a code that receives notification about collisions
@@ -53,4 +64,5 @@ public class Control : MonoBehaviour
 
 
     }
+
 }
