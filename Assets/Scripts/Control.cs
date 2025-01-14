@@ -44,7 +44,7 @@ public class Control : MonoBehaviour
     {
         // get the current target object
         currentTarget = target_seq[ix];
-        currentTargetObj = GameObject.Find(currentTarget);
+        currentTargetObj = GameObject.FindWithTag(currentTarget);
         OnCurrTargetChanged?.Invoke(currentTargetObj);
     }
 

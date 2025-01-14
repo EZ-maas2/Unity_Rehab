@@ -11,45 +11,45 @@ public class Sender : MonoBehaviour
     public GameObject ankleObj;
     public GameObject centerObj;
 
-    private double distance;
+    private double distance = -1.0;
 
 
     private UdpClient udpClient;
     public int PORT = 4242; // Ensure this matches your ESP32's UDP port
 
-    private string IP;
+    private string IP = "127.0.0.1";
     private IPEndPoint remoteEndPoint;
 
 
 
-    public string GetLocalIPAddress()
-    {
-        try
-        {
-            // Get the host name of the current device
-            string hostName = Dns.GetHostName();
+    // public string GetLocalIPAddress()
+    // {
+    //     try
+    //     {
+    //         // Get the host name of the current device
+    //         string hostName = Dns.GetHostName();
 
-            // Get the list of IP addresses associated with the device
-            IPAddress[] addresses = Dns.GetHostAddresses(hostName);
+    //         // Get the list of IP addresses associated with the device
+    //         IPAddress[] addresses = Dns.GetHostAddresses(hostName);
 
-            foreach (IPAddress address in addresses)
-            {
-                // Select the first IPv4 address that isn't a loopback
-                if (address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                {
-                    return address.ToString();
-                }
-            }
+    //         foreach (IPAddress address in addresses)
+    //         {
+    //             // Select the first IPv4 address that isn't a loopback
+    //             if (address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+    //             {
+    //                 return address.ToString();
+    //             }
+    //         }
 
-            return "No IPv4 address found.";
-        }
+    //         return "No IPv4 address found.";
+    //     }
 
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"Error getting local IP: {ex.Message}");
-            return "Error retrieving IP address.";
-        }
-    }
+    //     catch (System.Exception ex)
+    //     {
+    //         Debug.LogError($"Error getting local IP: {ex.Message}");
+    //         return "Error retrieving IP address.";
+    //     }
+    // }
 
 
     // Start is called before the first frame update
@@ -58,8 +58,9 @@ public class Sender : MonoBehaviour
         // subscribe to the current target
         Control.OnCurrTargetChanged += SetCurrTarget;
 
-        udpClient = new UdpClient(PORT);
-        IP = GetLocalIPAddress();
+        //udpClient = new UdpClient(PORT);
+        udpClient = new UdpClient();
+        //IP = GetLocalIPAddress();
         
         remoteEndPoint = new IPEndPoint(IPAddress.Parse(IP), PORT); 
 
@@ -72,9 +73,11 @@ public class Sender : MonoBehaviour
         try
         {
         string message = distance.ToString();
+        Debug.Log($"distance is calculated to be {distance}");
         byte[] data = Encoding.UTF8.GetBytes(message);
         udpClient.Send(data, data.Length, remoteEndPoint);
         }
+
         catch (System.Exception e)
         {
             Debug.LogError($"Error sending data: {e.Message}");
@@ -112,7 +115,7 @@ public class Sender : MonoBehaviour
         udpClient.Close();
     }
 
-    Control.OnCurrTargetChanged -= SetCurrTarget; // Unsubscribe
+    Control.OnCurrTargetChanged -= SetCurrTarget; 
 }
 
 
