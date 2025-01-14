@@ -56,13 +56,15 @@ public class Control : MonoBehaviour
         {
             Debug.Log("Hit current target, let's set new target!");
             hitTarget = true;
+            gameObject.GetComponent<AudioSource>().Play();
         }
         else
         {
             Debug.Log($"Current target is {currentTarget}, but we are detecting {tag}");
         }
-
-
     }
+
+
+
 
 }

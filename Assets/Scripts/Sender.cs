@@ -55,13 +55,8 @@ public class Sender : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // subscribe to the current target
         Control.OnCurrTargetChanged += SetCurrTarget;
-
-        //udpClient = new UdpClient(PORT);
         udpClient = new UdpClient();
-        //IP = GetLocalIPAddress();
-        
         remoteEndPoint = new IPEndPoint(IPAddress.Parse(IP), PORT); 
 
         Debug.Log($"Sending UDP data on port {PORT}.");
@@ -73,7 +68,6 @@ public class Sender : MonoBehaviour
         try
         {
         string message = distance.ToString();
-        Debug.Log($"distance is calculated to be {distance}");
         byte[] data = Encoding.UTF8.GetBytes(message);
         udpClient.Send(data, data.Length, remoteEndPoint);
         }
