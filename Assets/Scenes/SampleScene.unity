@@ -1396,7 +1396,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1843881630}
-  - component: {fileID: 1843881629}
+  - component: {fileID: 1843881631}
   m_Layer: 0
   m_Name: Receiver
   m_TagString: Untagged
@@ -1404,19 +1404,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1843881629
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1843881628}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c07d536fbd0a6b4f96cbdc189386154, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  listenPort: 6969
 --- !u!4 &1843881630
 Transform:
   m_ObjectHideFlags: 0
@@ -1432,6 +1419,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1843881631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1843881628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ab0eb202bad7cf4f9f811ab99944a90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PORT: 6969
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
