@@ -2,6 +2,8 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TcpReceiver : MonoBehaviour
@@ -11,9 +13,13 @@ public class TcpReceiver : MonoBehaviour
     private Socket listener;
     private Socket handler;
     private byte[] buffer = new byte[1024];
+    public static event Action<Vector3> OnPosReceived;
+
+    private string messageToMicro =  "0, 0, 0";
 
     private void Start()
     {
+        Control.OnCurrTargetChanged += ChangeMessageToMicro;
         listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         listener.Bind(new IPEndPoint(IPAddress.Any, PORT));
         listener.Listen(1);
@@ -42,9 +48,13 @@ public class TcpReceiver : MonoBehaviour
         try
         {
             int received = handler.EndReceive(ar);
-            string message = Encoding.UTF8.GetString(buffer, 0, received);
-            Debug.Log($"Received: {message}");
-            byte[] ackMessage = Encoding.UTF8.GetBytes("Hi");
+            string msg = Encoding.UTF8.GetString(buffer, 0, received);
+            Debug.Log($"Received: {msg}");
+
+            string[] receivedData = msg.Split(",");
+            OnPosReceived?.Invoke(new Vector3(float.Parse(receivedData[0]), float.Parse(receivedData[1]), float.Parse(receivedData[2])));
+
+            byte[] ackMessage = Encoding.UTF8.GetBytes(messageToMicro);
             handler.Send(ackMessage);
             Debug.Log("Acknowledgment sent.");
             
@@ -60,6 +70,17 @@ public class TcpReceiver : MonoBehaviour
             // Continue receiving
             handler.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, OnDataReceived, null);
         }
+    }
+
+
+    void ChangeMessageToMicro(GameObject targetObj)
+    {
+        string target_tag = targetObj.tag;
+        if (target_tag == "Front"){ messageToMicro = "1, 0, 0";}
+        else if (target_tag == "Side"){messageToMicro = "0, 1, 0";}
+        else if (target_tag == "Back"){messageToMicro = "0, 0, 1";}
+        else {messageToMicro = "0, 0, 0";}
+
     }
 
     private void OnApplicationQuit()

@@ -5,12 +5,13 @@ using UnityEngine;
 
 public class Ankle : MonoBehaviour
 {
+    // Ankle should handle all the logic pertaining to converting the received position into the ankle posiution 
 
     Vector3 curr_destination; 
     // Start is called before the first frame update
     void Start()
     {
-        UdpReceiver.OnPosReceived += SetNewDestination;
+        TcpReceiver.OnPosReceived += SetNewDestination;
     }
 
     // Update is called once per frame

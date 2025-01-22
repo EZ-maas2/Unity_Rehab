@@ -12,12 +12,22 @@ using System;
 public class Control : MonoBehaviour
 {
     public string[] target_seq =  {"Front", "Center", "Side", "Center"}; // maybe this should represnt tags of intended collsiion objects
-    bool hitTarget = false;
+    bool hitNewTarget = false;
     string currentTarget; // we want to notify interested parties when currentTarget gets changed
+   
     GameObject currentTargetObj;
     public static event Action<GameObject> OnCurrTargetChanged;
 
     int target_ix = 0;
+
+    public Vector3 screen_coordinates;
+    public Vector3 screen_rotation;
+    public GameObject screen; // should this be a pointer
+    
+    public GameObject screen_front;
+    public GameObject screen_side;
+    public GameObject screen_center;
+    public GameObject screen_back;
 
     // Start is called before the first frame update
     void Start()
@@ -30,20 +40,21 @@ public class Control : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (hitTarget)
+        if (hitNewTarget)
         {
-            hitTarget = false;
+            hitNewTarget = false;
             target_ix ++;
             if (target_ix >= target_seq.Length) 
-            { target_ix = 0; } // if we are outside of range of target sequence, restart it
-        }   
-        SetCurrTarget(target_ix);
+                { target_ix = 0; } // if we are outside of range of target sequence, restart it
+            SetCurrTarget(target_ix);
+        }
     }
 
     void SetCurrTarget(int ix)
     {
         // get the current target object
         currentTarget = target_seq[ix];
+        UpdateInstructions(currentTarget);
         currentTargetObj = GameObject.FindWithTag(currentTarget);
         OnCurrTargetChanged?.Invoke(currentTargetObj);
     }
@@ -55,13 +66,43 @@ public class Control : MonoBehaviour
         if (tag == currentTarget)
         {
             Debug.Log("Hit current target, let's set new target!");
-            hitTarget = true;
+            hitNewTarget = true;
             gameObject.GetComponent<AudioSource>().Play();
         }
         else
         {
             Debug.Log($"Current target is {currentTarget}, but we are detecting {tag}");
         }
+    }
+
+
+    void UpdateInstructions(string target_tag)
+    {
+        // This function defines what the user sees
+        // we take the string of current target and based on it defibne what object is shown
+        if (screen) 
+        {
+            Destroy(screen);
+        }
+        
+        if (target_tag == "Front")
+        { 
+            screen = Instantiate(screen_front, screen_coordinates,  Quaternion.Euler(screen_rotation));
+            }
+        else if (target_tag == "Side")
+        {
+            screen = Instantiate(screen_side, screen_coordinates,  Quaternion.Euler(screen_rotation));
+            }
+        else if (target_tag == "Back")
+        {
+            screen =Instantiate(screen_back, screen_coordinates,  Quaternion.Euler(screen_rotation));
+            }
+        else {
+            screen =Instantiate(screen_center, screen_coordinates,  Quaternion.Euler(screen_rotation));
+            }
+
+
+
     }
 
 
