@@ -65,6 +65,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Collision.cs" />
+    <Compile Include="Assets\Scripts\ReceiverTCP.cs" />
+    <Compile Include="Assets\Scripts\Sender.cs" />
     <Compile Include="Assets\Scripts\Control.cs" />
     <Compile Include="Assets\Scripts\Receiver.cs" />
     <Compile Include="Assets\Scripts\Ankle.cs" />

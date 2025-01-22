@@ -44,9 +44,10 @@ public class TcpReceiver : MonoBehaviour
             int received = handler.EndReceive(ar);
             string message = Encoding.UTF8.GetString(buffer, 0, received);
             Debug.Log($"Received: {message}");
-            byte[] ackMessage = Encoding.UTF8.GetBytes("<|ACK|>");
+            byte[] ackMessage = Encoding.UTF8.GetBytes("Hi");
             handler.Send(ackMessage);
             Debug.Log("Acknowledgment sent.");
+            
 
             
         }

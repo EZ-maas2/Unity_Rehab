@@ -51,5 +51,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "NISE_Rehab.sln"
+    "dotnet.defaultSolution": "Unity_Rehab.sln"
 }
