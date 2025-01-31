@@ -13,7 +13,11 @@ public class TcpReceiver : MonoBehaviour
     private Socket listener;
     private Socket handler;
     private byte[] buffer = new byte[1024];
+    private bool calibrationOver = false;
+
     public static event Action<Vector3> OnPosReceived;
+    public static event Action<string> OnCalibrationReceived;
+    public static event Action OnCalibrationOver;
 
     private string messageToMicro =  "0, 0, 0";
 
@@ -43,6 +47,8 @@ public class TcpReceiver : MonoBehaviour
         }
     }
 
+    //void()
+
     private void OnDataReceived(IAsyncResult ar)
     {
         try
@@ -51,16 +57,37 @@ public class TcpReceiver : MonoBehaviour
             string msg = Encoding.UTF8.GetString(buffer, 0, received);
             Debug.Log($"Received: {msg}");
 
+            
+
+            if (calibrationOver)
+            {
+            OnCalibrationOver?.Invoke();
             string[] receivedData = msg.Split(",");
             OnPosReceived?.Invoke(new Vector3(float.Parse(receivedData[0]), float.Parse(receivedData[1]), float.Parse(receivedData[2])));
 
             byte[] ackMessage = Encoding.UTF8.GetBytes(messageToMicro);
             handler.Send(ackMessage);
             Debug.Log("Acknowledgment sent.");
-            
 
-            
+            }
+
+            if (msg == "Over" || msg == "over"||msg == "o")
+            { calibrationOver = true; 
+            Debug.Log("Calibration is over!--------------");
+            byte[] ackMessage = Encoding.UTF8.GetBytes("Calibration ended");
+            handler.Send(ackMessage);
+            Debug.Log("Acknowledgment sent.");}
+
+            if (calibrationOver != true) {
+                byte[] ackMessage = Encoding.UTF8.GetBytes("Got it");
+                handler.Send(ackMessage);
+                Debug.Log("Acknowledgment sent.");
+                CalibrationMsg(msg);
+                
+            }
+
         }
+
         catch (Exception e)
         {
             Debug.LogError($"Error receiving data: {e.Message}");
@@ -72,7 +99,13 @@ public class TcpReceiver : MonoBehaviour
         }
     }
 
+    void CalibrationMsg(string msg)
+    {
+        if (msg == "Front" || msg == "Side" || msg == "Center"){
+            OnCalibrationReceived(msg);
+        }
 
+    }
     void ChangeMessageToMicro(GameObject targetObj)
     {
         string target_tag = targetObj.tag;
