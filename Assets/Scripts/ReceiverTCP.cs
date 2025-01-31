@@ -61,7 +61,6 @@ public class TcpReceiver : MonoBehaviour
 
             if (calibrationOver)
             {
-            OnCalibrationOver?.Invoke();
             string[] receivedData = msg.Split(",");
             OnPosReceived?.Invoke(new Vector3(float.Parse(receivedData[0]), float.Parse(receivedData[1]), float.Parse(receivedData[2])));
 
@@ -72,11 +71,13 @@ public class TcpReceiver : MonoBehaviour
             }
 
             if (msg == "Over" || msg == "over"||msg == "o")
-            { calibrationOver = true; 
+            { 
+            calibrationOver = true; 
             Debug.Log("Calibration is over!--------------");
             byte[] ackMessage = Encoding.UTF8.GetBytes("Calibration ended");
             handler.Send(ackMessage);
-            Debug.Log("Acknowledgment sent.");}
+            Debug.Log("Acknowledgment sent.");
+            OnCalibrationOver?.Invoke();}
 
             if (calibrationOver != true) {
                 byte[] ackMessage = Encoding.UTF8.GetBytes("Got it");

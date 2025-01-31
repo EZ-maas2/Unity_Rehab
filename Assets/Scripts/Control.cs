@@ -17,6 +17,7 @@ public class Control : MonoBehaviour
    
     GameObject currentTargetObj;
     public static event Action<GameObject> OnCurrTargetChanged;
+    public static event Action OnCalEnded;
 
     int target_ix = 0;
 
@@ -30,6 +31,7 @@ public class Control : MonoBehaviour
     public GameObject screen_back;
     private string nextScreenTag; 
     private bool CalibrationOver = false; 
+    private bool StartedLogic = false; 
 
     // Start is called before the first frame update
     void Start()
@@ -54,18 +56,27 @@ public class Control : MonoBehaviour
         Collision.OnPlateTriger += ReactToCollision;
         TcpReceiver.OnCalibrationReceived += UpdateInstructions;
         TcpReceiver.OnCalibrationOver += ReactToCalibrationOver;
+        Control.OnCalEnded += LogicStart;
         //SetCurrTarget(target_ix);
     }
 
     void ReactToCalibrationOver()
     {
+        Debug.Log("React to calibration over is called");
         CalibrationOver = true;
+        OnCalEnded?.Invoke();
+    }
+
+    void LogicStart(){
+        
+        Debug.Log("Logic Started");
+        SetCurrTarget(target_ix);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (CalibrationOver){SetCurrTarget(target_ix);}
+
         if (hitNewTarget)
         {
             hitNewTarget = false;
@@ -106,13 +117,11 @@ public class Control : MonoBehaviour
 void UpdateInstructions(string target_tag)
 {
     nextScreenTag = target_tag;
-    // Call a method on the main thread with a slight delay (0 seconds)
 }
 
-// This method runs on the main Unity thread
 void ExecuteUpdateInstructions()
 {
-    if (currentScreen) currentScreen.SetActive(false);
+    if (currentScreen) currentScreen.SetActive(false); // turn off the previous screen
 
     switch (nextScreenTag)
     {
@@ -130,40 +139,11 @@ void ExecuteUpdateInstructions()
             break;
     }
 
-    if (currentScreen) currentScreen.SetActive(true);
-}
+    if (currentScreen) currentScreen.SetActive(true); // turn on the new screen
 
 }
+}
 
-
-    // void UpdateInstructions(string target_tag)
-    // {
-    //     // This function defines what the user sees
-    //     // we take the string of current target and based on it defibne what object is shown
-    //     if (screen) 
-    //     {
-    //         Destroy(screen);
-    //     }
-        
-    //     if (target_tag == "Front")
-    //     { 
-    //         screen = Instantiate(screen_front, screen_coordinates,  Quaternion.Euler(screen_rotation));
-    //         }
-    //     else if (target_tag == "Side")
-    //     {
-    //         screen = Instantiate(screen_side, screen_coordinates,  Quaternion.Euler(screen_rotation));
-    //         }
-    //     else if (target_tag == "Back")
-    //     {
-    //         screen =Instantiate(screen_back, screen_coordinates,  Quaternion.Euler(screen_rotation));
-    //         }
-    //     else {
-    //         screen =Instantiate(screen_center, screen_coordinates,  Quaternion.Euler(screen_rotation));
-    //         }
-
-
-
-    // }
 
 
 
