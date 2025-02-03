@@ -14,12 +14,13 @@ public class TcpReceiver : MonoBehaviour
     private Socket handler;
     private byte[] buffer = new byte[1024];
     private bool calibrationOver = false;
+    private bool ifClientConnected = false;
 
     public static event Action<Vector3> OnPosReceived;
     public static event Action<string> OnCalibrationReceived;
     public static event Action OnCalibrationOver;
 
-    private string messageToMicro =  "0, 0, 0";
+    private string messageToMicro =  "0, 0, 0\n";
 
     private void Start()
     {
@@ -32,12 +33,26 @@ public class TcpReceiver : MonoBehaviour
         listener.BeginAccept(OnClientConnected, null);
     }
 
+
+
+
     private void OnClientConnected(IAsyncResult ar)
     {
         handler = listener.EndAccept(ar);
         Debug.Log("Client connected.");
         BeginReceive();
+        ifClientConnected = true;
     }
+
+    // private void Update(){
+    //     if (ifClientConnected && calibrationOver)
+    //     {
+    //     byte[] ackMessage = Encoding.UTF8.GetBytes(messageToMicro);
+    //     handler.Send(ackMessage);
+    //     Debug.Log("Acknowledgment sent.");
+    //     }
+
+    // }
 
     private void BeginReceive()
     {
@@ -110,10 +125,10 @@ public class TcpReceiver : MonoBehaviour
     void ChangeMessageToMicro(GameObject targetObj)
     {
         string target_tag = targetObj.tag;
-        if (target_tag == "Front"){ messageToMicro = "1, 0, 0";}
-        else if (target_tag == "Side"){messageToMicro = "0, 1, 0";}
-        else if (target_tag == "Back"){messageToMicro = "0, 0, 1";}
-        else {messageToMicro = "0, 0, 0";}
+        if (target_tag == "Front"){ messageToMicro = "1, 0, 0\n";}
+        else if (target_tag == "Side"){messageToMicro = "0, 1, 0\n";}
+        else if (target_tag == "Back"){messageToMicro = "0, 0, 1\n";}
+        else {messageToMicro = "0, 0, 0\n";}
 
     }
 
