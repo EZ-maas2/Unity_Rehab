@@ -20,11 +20,12 @@ public class TcpReceiver : MonoBehaviour
     public static event Action<string> OnCalibrationReceived;
     public static event Action OnCalibrationOver;
 
-    private string messageToMicro =  "0, 0, 0\n";
+    private string messageToMicro =  "1, 0, 0\n";
+
+    public Control control_instance;
 
     private void Start()
     {
-        Control.OnCurrTargetChanged += ChangeMessageToMicro;
         listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         listener.Bind(new IPEndPoint(IPAddress.Any, PORT));
         listener.Listen(1);
@@ -44,15 +45,6 @@ public class TcpReceiver : MonoBehaviour
         ifClientConnected = true;
     }
 
-    // private void Update(){
-    //     if (ifClientConnected && calibrationOver)
-    //     {
-    //     byte[] ackMessage = Encoding.UTF8.GetBytes(messageToMicro);
-    //     handler.Send(ackMessage);
-    //     Debug.Log("Acknowledgment sent.");
-    //     }
-
-    // }
 
     private void BeginReceive()
     {
@@ -62,7 +54,8 @@ public class TcpReceiver : MonoBehaviour
         }
     }
 
-    //void()
+ 
+
 
     private void OnDataReceived(IAsyncResult ar)
     {
@@ -78,10 +71,7 @@ public class TcpReceiver : MonoBehaviour
             {
             string[] receivedData = msg.Split(",");
             OnPosReceived?.Invoke(new Vector3(float.Parse(receivedData[0]), float.Parse(receivedData[1]), float.Parse(receivedData[2])));
-
-            byte[] ackMessage = Encoding.UTF8.GetBytes(messageToMicro);
-            handler.Send(ackMessage);
-            Debug.Log("Acknowledgment sent.");
+            SendMessageToMicro(msg);
 
             }
 
@@ -89,17 +79,17 @@ public class TcpReceiver : MonoBehaviour
             { 
             calibrationOver = true; 
             Debug.Log("Calibration is over!--------------");
-            byte[] ackMessage = Encoding.UTF8.GetBytes("Calibration ended");
+            byte[] ackMessage = Encoding.UTF8.GetBytes(messageToMicro);
             handler.Send(ackMessage);
             Debug.Log("Acknowledgment sent.");
             OnCalibrationOver?.Invoke();}
 
-            if (calibrationOver != true) {
+            if (calibrationOver != true) // placeholder response message for ensuring good connection during calibration
+            {
                 byte[] ackMessage = Encoding.UTF8.GetBytes("Got it");
                 handler.Send(ackMessage);
                 Debug.Log("Acknowledgment sent.");
-                CalibrationMsg(msg);
-                
+                CalibrationMsg(msg);  
             }
 
         }
@@ -122,13 +112,35 @@ public class TcpReceiver : MonoBehaviour
         }
 
     }
-    void ChangeMessageToMicro(GameObject targetObj)
+    void ChangeMessageToMicro(string target_tag)
     {
-        string target_tag = targetObj.tag;
         if (target_tag == "Front"){ messageToMicro = "1, 0, 0\n";}
         else if (target_tag == "Side"){messageToMicro = "0, 1, 0\n";}
         else if (target_tag == "Back"){messageToMicro = "0, 0, 1\n";}
         else {messageToMicro = "0, 0, 0\n";}
+
+    }
+
+
+    void SendMessageToMicro(string pos)
+    {   string msg_pos;
+
+        if (pos == "0.0, 0.0, -1.0"){ msg_pos = "Front";}
+        else if (pos == "-1.0, 0.0, 0.0"){msg_pos = "Side";}
+        else {msg_pos = "Center";}
+
+
+        string new_pos = control_instance.getNextTargetTag();
+
+        // if we hit the target, end the new position
+        if (control_instance.currentTarget == msg_pos) {
+            ChangeMessageToMicro(new_pos);
+        }
+
+        byte[] ackMessage = Encoding.UTF8.GetBytes(messageToMicro);
+        handler.Send(ackMessage);
+        Debug.Log("Acknowledgment sent.");
+
 
     }
 

@@ -359,8 +359,6 @@
 "Assets/Scripts/Collision.cs"
 "Assets/Scripts/Control.cs"
 "Assets/Scripts/ReceiverTCP.cs"
-"Assets/Scripts/unused/Receiver.cs"
-"Assets/Scripts/unused/Sender.cs"
 -langversion:9.0
 
 /deterministic

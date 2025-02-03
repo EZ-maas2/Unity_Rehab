@@ -13,10 +13,10 @@ public class Control : MonoBehaviour
 {
     public string[] target_seq =  {"Front", "Center", "Side", "Center"}; // maybe this should represnt tags of intended collsiion objects
     bool hitNewTarget = false;
-    string currentTarget; // we want to notify interested parties when currentTarget gets changed
+    public string currentTarget; // we want to notify interested parties when currentTarget gets changed
    
     GameObject currentTargetObj;
-    public static event Action<GameObject> OnCurrTargetChanged;
+    public static event Action<string> OnCurrTargetChanged;
     public static event Action OnCalEnded;
 
     int target_ix = 0;
@@ -60,6 +60,13 @@ public class Control : MonoBehaviour
         //SetCurrTarget(target_ix);
     }
 
+    public string getNextTargetTag(){
+         int next_ix = target_ix + 1;
+            if (next_ix >= target_seq.Length) 
+                { next_ix = 0; } // if we are outside of range of target sequence, restart it
+        return target_seq[next_ix];
+    }
+
     void ReactToCalibrationOver()
     {
         Debug.Log("React to calibration over is called");
@@ -94,7 +101,7 @@ public class Control : MonoBehaviour
         currentTarget = target_seq[ix];
         UpdateInstructions(currentTarget);
         currentTargetObj = GameObject.FindWithTag(currentTarget);
-        OnCurrTargetChanged?.Invoke(currentTargetObj);
+        OnCurrTargetChanged?.Invoke(currentTargetObj.tag);
     }
 
     void ReactToCollision(string tag){
